@@ -1,11 +1,13 @@
 # 🛡️ LoanGuard AI — Credit Risk Analysis & Loan Default Prediction (Data Science & ML)
 
 [![Python Version](https://img.shields.io/badge/Python-3.11-3776AB.svg?style=flat&logo=python&logoColor=white)](https://python.org)
-[![Streamlit App](https://img.shields.io/badge/Streamlit-1.30+-FF4B4B.svg?style=flat&logo=streamlit&logoColor=white)](https://streamlit.io)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://loan-default-risk-prediction-nz2tp5cf3ggztvuccjdoe8.streamlit.app/)
 [![Scikit-Learn](https://img.shields.io/badge/scikit--learn-1.4+-F7931E.svg?style=flat&logo=scikit-learn&logoColor=white)](https://scikit-learn.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 An end-to-end **Data Science & Applied Machine Learning** platform that combines exploratory credit risk analysis, feature engineering, and predictive modeling with a real-time Streamlit underwriting portal.
+
+> 🌐 **Live Web Application:** [loan-default-risk-prediction.streamlit.app](https://loan-default-risk-prediction-nz2tp5cf3ggztvuccjdoe8.streamlit.app/)
 
 ---
 
