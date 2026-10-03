@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LoanGuard AI | Intelligent Credit Underwriting & Default Risk Predictor</title>
+    <!-- Google Fonts: Outfit (Display & Headings) + Plus Jakarta Sans (Body & UI) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body class="theme-dark">
+
+    <!-- Ambient Glowing Background Elements -->
+    <div class="ambient-glow glow-1"></div>
+    <div class="ambient-glow glow-2"></div>
+    <div class="ambient-glow glow-3"></div>
+
+    <!-- ============================================== -->
+    <!-- TOP NAVIGATION BAR                             -->
+    <!-- ============================================== -->
+    <header class="navbar" id="mainNavbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <div class="brand-logo-wrap">
+                    <div class="brand-shield">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            <path d="m9 12 2 2 4-4"/>
+                        </svg>
+                    </div>
+                    <div class="brand-sparkle"></div>
+                </div>
+                <div class="brand-details">
+                    <div class="brand-title">LoanGuard<span class="gradient-text">AI</span></div>
+                    <div class="brand-tagline">Autonomous Credit Verification Engine</div>
+                </div>
+            </div>
+
+            <!-- Central Navigation Tabs -->
+            <nav class="nav-menu" id="navTabs">
+                <button class="nav-btn active" data-tab="tab-predictor" id="tabBtnPredictor">
+                    <span class="nav-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                    </span>
+                    <span>Loan Verification</span>
+                </button>
+                <button class="nav-btn" data-tab="tab-analytics" id="tabBtnAnalytics">
+                    <span class="nav-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+                    </span>
+                    <span>Model Comparison</span>
+                </button>
+                <button class="nav-btn" data-tab="tab-calculator" id="tabBtnCalculator">
+                    <span class="nav-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="8" y1="6" x2="16" y2="6"/><line x1="16" y1="14" x2="16" y2="18"/><path d="M16 10h.01"/><path d="M12 10h.01"/><path d="M8 10h.01"/><path d="M12 14h.01"/><path d="M8 14h.01"/><path d="M12 18h.01"/><path d="M8 18h.01"/></svg>
+                    </span>
+                    <span>Risk Simulator</span>
+                </button>
+                <button class="nav-btn" data-tab="tab-methodology" id="tabBtnMethodology">
+                    <span class="nav-icon">
+                        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                    </span>
+                    <span>Benchmark Docs</span>
+                </button>
+            </nav>
+
+            <!-- Live Engine Status Pill -->
+            <div class="engine-badge">
+                <div class="pulse-dot"></div>
+                <div class="engine-info">
+                    <span class="engine-name">Random Forest Balanced</span>
+                    <span class="engine-stat">Macro F1: 41.0% • Active</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- ============================================== -->
+    <!-- HERO STATS STRIP                               -->
+    <!-- ============================================== -->
+    <div class="stats-strip">
+        <div class="strip-container">
+            <div class="strip-item">
+                <div class="strip-icon icon-blue">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+                </div>
+                <div class="strip-meta">
+                    <span class="strip-val">38,574</span>
+                    <span class="strip-lbl">Historical Loans Analyzed</span>
+                </div>
+            </div>
+
+            <div class="strip-item">
+                <div class="strip-icon icon-green">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg>
+                </div>
+                <div class="strip-meta">
+                    <span class="strip-val text-green">2.2x Higher Recall</span>
+                    <span class="strip-lbl">On Default Defaulters (20.1% vs 9.0%)</span>
+                </div>
+            </div>
+
+            <div class="strip-item">
+                <div class="strip-icon icon-amber">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <div class="strip-meta">
+                    <span class="strip-val">Zero Leakage</span>
+                    <span class="strip-lbl">Post-Origination Metrics Pruned</span>
+                </div>
+            </div>
+
+            <div class="strip-item">
+                <div class="strip-icon icon-purple">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                </div>
+                <div class="strip-meta">
+                    <span class="strip-val">&lt; 15 ms</span>
+                    <span class="strip-lbl">Instant Inference Latency</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- MAIN APPLICATION WRAPPER                       -->
+    <!-- ============================================== -->
+    <main class="app-body">
+
+        <!-- ========================================== -->
+        <!-- TAB 1: SMART LOAN VERIFICATION & PREDICTOR -->
+        <!-- ========================================== -->
+        <section class="tab-pane active" id="tab-predictor">
+
+            <!-- Section Banner & Quick Profiles -->
+            <div class="section-hero">
+                <div class="hero-left">
+                    <div class="badge-pill">
+                        <span class="pill-dot"></span>
+                        <span>Credit Decisioning Portal</span>
+                    </div>
+                    <h1 class="hero-title">Automated Borrower Risk & Loan Verification</h1>
+                    <p class="hero-sub">Evaluate loan viability, compute probability of default, and detect credit risk using the trained balanced machine learning model.</p>
+                </div>
+
+                <!-- Interactive Profile Cards -->
+                <div class="preset-profiles-container">
+                    <div class="preset-label-header">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+                        <span>Simulate Test Applicant Profiles:</span>
+                    </div>
+                    <div class="profiles-grid">
+                        <!-- Prime Borrower -->
+                        <div class="profile-card profile-prime" id="presetPrime" role="button" tabindex="0">
+                            <div class="profile-card-top">
+                                <span class="profile-badge badge-prime">Prime Tier</span>
+                                <span class="profile-action">Click to Load &rarr;</span>
+                            </div>
+                            <div class="profile-name">Sarah Jenkins</div>
+                            <div class="profile-stats">
+                                <span>Income: <strong>$95,000</strong></span>
+                                <span>Loan: <strong>$10,000</strong></span>
+                                <span>DTI: <strong>11.2%</strong></span>
+                            </div>
+                            <div class="profile-expected text-green">&#10003; Predicted: Approved (Low Risk)</div>
+                        </div>
+
+                        <!-- Moderate Risk -->
+                        <div class="profile-card profile-moderate" id="presetModerate" role="button" tabindex="0">
+                            <div class="profile-card-top">
+                                <span class="profile-badge badge-moderate">Near-Prime</span>
+                                <span class="profile-action">Click to Load &rarr;</span>
+                            </div>
+                            <div class="profile-name">David Chen</div>
+                            <div class="profile-stats">
+                                <span>Income: <strong>$48,000</strong></span>
+                                <span>Loan: <strong>$14,000</strong></span>
+                                <span>DTI: <strong>22.4%</strong></span>
+                            </div>
+                            <div class="profile-expected text-amber">&#9888; Predicted: Conditional Review</div>
+                        </div>
+
+                        <!-- High Risk Defaulter -->
+                        <div class="profile-card profile-subprime" id="presetHighRisk" role="button" tabindex="0">
+                            <div class="profile-card-top">
+                                <span class="profile-badge badge-subprime">Subprime</span>
+                                <span class="profile-action">Click to Load &rarr;</span>
+                            </div>
+                            <div class="profile-name">Marcus Cole</div>
+                            <div class="profile-stats">
+                                <span>Income: <strong>$30,000</strong></span>
+                                <span>Loan: <strong>$28,000</strong></span>
+                                <span>DTI: <strong>38.6%</strong></span>
+                            </div>
+                            <div class="profile-expected text-red">&#10007; Predicted: High Default Risk</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Workspace 2-Column Grid -->
+            <div class="workspace-grid">
+
+                <!-- Left Column: Input Form -->
+                <div class="glass-card form-panel">
+                    <div class="panel-header">
+                        <div class="panel-title-wrap">
+                            <div class="panel-icon">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                            </div>
+                            <div>
+                                <h2 class="panel-heading">Applicant Credit Parameters</h2>
+                                <p class="panel-sub">Enter verified financial signals for automated scoring</p>
+                            </div>
+                        </div>
+                        <button type="button" class="btn-ghost-sm" id="btnResetForm">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                            Clear Form
+                        </button>
+                    </div>
+
+                    <form id="loanForm" class="underwriting-form">
+                        
+                        <!-- Group 1: Loan Facilities -->
+                        <div class="form-section-title">
+                            <span>01</span> Loan Request Terms
+                        </div>
+
+                        <div class="inputs-grid">
+                            <!-- Loan Amount -->
+                            <div class="field-box">
+                                <div class="field-top">
+                                    <label for="loan_amount">Requested Loan Amount ($)</label>
+                                    <span class="field-hint" id="hintLoanAmount">$10,000</span>
+                                </div>
+                                <div class="input-shell">
+                                    <span class="currency-symbol">$</span>
+                                    <input type="number" id="loan_amount" name="loan_amount" min="1000" max="40000" step="100" value="10000" required>
+                                </div>
+                                <input type="range" class="synced-range" id="range_loan_amount" min="1000" max="40000" step="500" value="10000">
+                            </div>
+
+                            <!-- Monthly Installment -->
+                            <div class="field-box">
+                                <div class="field-top">
+                                    <label for="installment">Monthly Installment ($)</label>
+                                    <span class="field-hint" id="hintInstallment">$308.50/mo</span>
+                                </div>
+                                <div class="input-shell">
+                                    <span class="currency-symbol">$</span>
+                                    <input type="number" id="installment" name="installment" min="20" max="2000" step="0.5" value="308.50" required>
+                                </div>
+                                <input type="range" class="synced-range" id="range_installment" min="20" max="1500" step="10" value="308.50">
+                            </div>
+
+                            <!-- Interest Rate -->
+                            <div class="field-box">
+                                <div class="field-top">
+                                    <label for="int_rate">Interest Rate (%)</label>
+                                    <span class="field-hint" id="hintIntRate">6.89% APR</span>
+                                </div>
+                                <div class="input-shell">
+                                    <span class="currency-symbol">%</span>
+                                    <input type="number" id="int_rate" name="int_rate" min="4" max="35" step="0.01" value="6.89" required>
+                                </div>
+                                <input type="range" class="synced-range" id="range_int_rate" min="4" max="32" step="0.25" value="6.89">
+                            </div>
+                        </div>
+
+                        <!-- Group 2: Borrower Financials -->
+                        <div class="form-section-title">
+                            <span>02</span> Borrower Income & Obligations
+                        </div>
+
+                        <div class="inputs-grid">
+                            <!-- Annual Income -->
+                            <div class="field-box">
+                                <div class="field-top">
+                                    <label for="annual_income">Gross Annual Income ($)</label>
+                                    <span class="field-hint" id="hintIncome">$95,000/yr</span>
+                                </div>
+                                <div class="input-shell">
+                                    <span class="currency-symbol">$</span>
+                                    <input type="number" id="annual_income" name="annual_income" min="5000" max="300000" step="1000" value="95000" required>
+                                </div>
+                                <input type="range" class="synced-range" id="range_annual_income" min="10000" max="250000" step="2500" value="95000">
+                            </div>
+
+                            <!-- Debt-to-Income (DTI) -->
+                            <div class="field-box">
+                                <div class="field-top">
+                                    <label for="dti">Debt-to-Income Ratio (DTI %)</label>
+                                    <span class="field-hint" id="hintDTI">11.2% Ratio</span>
+                                </div>
+                                <div class="input-shell">
+                                    <span class="currency-symbol">%</span>
+                                    <input type="number" id="dti" name="dti" min="0" max="60" step="0.1" value="11.2" required>
+                                </div>
+                                <input type="range" class="synced-range" id="range_dti" min="0" max="50" step="0.5" value="11.2">
+                            </div>
+                        </div>
+
+                        <!-- Group 3: Categorical Background -->
+                        <div class="form-section-title">
+                            <span>03</span> Verification & Collateral Profile
+                        </div>
+
+                        <div class="inputs-grid-three">
+                            <!-- Home Ownership -->
+                            <div class="select-box">
+                                <label for="home_ownership">Home Ownership</label>
+                                <div class="select-shell">
+                                    <select id="home_ownership" name="home_ownership" required>
+                                        {% for item in options.get('home_ownership', ['RENT', 'MORTGAGE', 'OWN']) %}
+                                            <option value="{{ item }}" {% if item == 'MORTGAGE' %}selected{% endif %}>{{ item }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Verification Status -->
+                            <div class="select-box">
+                                <label for="verification_status">Income Verification</label>
+                                <div class="select-shell">
+                                    <select id="verification_status" name="verification_status" required>
+                                        {% for item in options.get('verification_status', ['Verified', 'Source Verified', 'Not Verified']) %}
+                                            <option value="{{ item }}" {% if item == 'Verified' %}selected{% endif %}>{{ item }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Application Type -->
+                            <div class="select-box">
+                                <label for="application_type">Application Type</label>
+                                <div class="select-shell">
+                                    <select id="application_type" name="application_type" required>
+                                        {% for item in options.get('application_type', ['INDIVIDUAL']) %}
+                                            <option value="{{ item }}">{{ item }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Real-time Quick Health Preview -->
+                        <div class="live-math-bar">
+                            <div class="live-math-item">
+                                <span class="math-lbl">Est. Monthly Debt Burden</span>
+                                <strong class="math-val" id="quickBurden">3.9% of income</strong>
+                            </div>
+                            <div class="live-math-item">
+                                <span class="math-lbl">Loan-to-Income Multiple</span>
+                                <strong class="math-val" id="quickLTI">0.11x</strong>
+                            </div>
+                            <div class="live-math-item">
+                                <span class="math-lbl">DTI Health Status</span>
+                                <strong class="math-val text-green" id="quickDTIStatus">Excellent (&lt; 20%)</strong>
+                            </div>
+                        </div>
+
+                        <!-- Form Submit Button -->
+                        <div class="submit-action-wrap">
+                            <button type="submit" class="btn-execute" id="btnSubmit">
+                                <span class="btn-glow-layer"></span>
+                                <span class="btn-content">
+                                    <svg class="btn-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                                    <span class="btn-text">Execute Underwriting Risk Assessment</span>
+                                    <span class="spinner" id="btnSpinner"></span>
+                                </span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Right Column: Decision Hologram & Results -->
+                <div class="glass-card result-panel" id="resultCard">
+                    
+                    <!-- Idle Welcome State -->
+                    <div class="idle-state" id="emptyState">
+                        <div class="radar-scan">
+                            <div class="radar-circle circle-1"></div>
+                            <div class="radar-circle circle-2"></div>
+                            <div class="radar-circle circle-3"></div>
+                            <div class="radar-sweep"></div>
+                            <div class="radar-core">
+                                <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                            </div>
+                        </div>
+                        <h3 class="idle-title">Awaiting Applicant Evaluation</h3>
+                        <p class="idle-desc">Click <strong>Execute Risk Assessment</strong> or choose a test applicant above to inspect real-time AI credit decisioning.</p>
+                        <div class="idle-badges">
+                            <span class="idle-pill">Random Forest AI</span>
+                            <span class="idle-pill">Macro F1 Optimized</span>
+                            <span class="idle-pill">Multiclass Scored</span>
+                        </div>
+                    </div>
+
+                    <!-- Dynamic Computed Result State -->
+                    <div class="decision-display" id="resultsContainer" style="display: none;">
+                        
+                        <!-- Top Banner with Glowing Status -->
+                        <div class="status-banner" id="decisionBanner">
+                            <div class="banner-glow-orbit"></div>
+                            <div class="status-icon-wrap" id="decisionIcon">
+                                <!-- Dynamic icon inserted via JS -->
+                            </div>
+                            <div class="status-meta">
+                                <div class="status-kicker" id="decisionKicker">CREDIT VERIFICATION DECISION</div>
+                                <h2 class="status-title" id="decisionTitle">VERIFIED & APPROVED</h2>
+                                <div class="risk-pill-badge" id="riskBadge">LOW RISK PROFILE</div>
+                            </div>
+                        </div>
+
+                        <!-- Gauge & Probability Visualization Hub -->
+                        <div class="risk-gauge-card">
+                            <div class="gauge-left">
+                                <div class="circular-meter-wrap">
+                                    <svg class="circular-meter" viewBox="0 0 100 100">
+                                        <circle class="meter-track" cx="50" cy="50" r="42"></circle>
+                                        <circle class="meter-progress" id="circleMeterProgress" cx="50" cy="50" r="42"></circle>
+                                    </svg>
+                                    <div class="meter-center-text">
+                                        <span class="meter-number" id="riskPercentValue">14.0%</span>
+                                        <span class="meter-caption">Default Risk</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="gauge-right">
+                                <div class="gauge-meta-title">Default Probability Assessment</div>
+                                <p class="gauge-meta-desc" id="gaugeMetaDesc">Model estimates a <strong>14.0% chance of default</strong>, comfortably below the 35% rejection threshold.</p>
+                                
+                                <div class="risk-bar-indicator">
+                                    <div class="spectrum-bar">
+                                        <div class="spectrum-marker" id="spectrumMarker" style="left: 14%;"></div>
+                                    </div>
+                                    <div class="spectrum-labels">
+                                        <span class="text-green">0% Safe</span>
+                                        <span class="text-amber">30% Review</span>
+                                        <span class="text-red">100% Critical</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Multiclass Probability Distribution -->
+                        <div class="prob-distribution-card">
+                            <div class="dist-header">
+                                <span class="dist-title">Multiclass Confidence Distribution</span>
+                                <span class="dist-engine">Model: Random Forest (Balanced)</span>
+                            </div>
+
+                            <div class="prob-row">
+                                <div class="prob-labels">
+                                    <span class="prob-name"><span class="dot-indicator bg-green"></span> Fully Paid (Good Standing)</span>
+                                    <strong class="prob-num text-green" id="probFullyPaid">83.5%</strong>
+                                </div>
+                                <div class="prob-track">
+                                    <div class="prob-fill fill-green" id="barFullyPaid" style="width: 83.5%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="prob-row">
+                                <div class="prob-labels">
+                                    <span class="prob-name"><span class="dot-indicator bg-red"></span> Charged Off (Default Risk)</span>
+                                    <strong class="prob-num text-red" id="probChargedOff">14.0%</strong>
+                                </div>
+                                <div class="prob-track">
+                                    <div class="prob-fill fill-red" id="barChargedOff" style="width: 14.0%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="prob-row">
+                                <div class="prob-labels">
+                                    <span class="prob-name"><span class="dot-indicator bg-amber"></span> Current (Active / In-Grace)</span>
+                                    <strong class="prob-num text-amber" id="probCurrent">2.5%</strong>
+                                </div>
+                                <div class="prob-track">
+                                    <div class="prob-fill fill-amber" id="barCurrent" style="width: 2.5%;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Financial Diagnostic Ratio Matrix -->
+                        <div class="metrics-triple-grid">
+                            <div class="metric-quad-box">
+                                <span class="quad-label">Monthly Debt Burden</span>
+                                <div class="quad-value" id="valBurden">3.9%</div>
+                                <span class="quad-sub">of Gross Monthly Income</span>
+                            </div>
+
+                            <div class="metric-quad-box">
+                                <span class="quad-label">Loan-to-Income Ratio</span>
+                                <div class="quad-value" id="valLTI">10.5%</div>
+                                <span class="quad-sub">Leverage Multiple</span>
+                            </div>
+
+                            <div class="metric-quad-box">
+                                <span class="quad-label">Applicant DTI</span>
+                                <div class="quad-value" id="valDTI">11.2%</div>
+                                <span class="quad-sub">Existing Debt Ratio</span>
+                            </div>
+                        </div>
+
+                        <!-- Underwriting Guidance Card -->
+                        <div class="guidance-card">
+                            <div class="guidance-header">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+                                <span>Underwriter Actionable Guidance</span>
+                            </div>
+                            <p class="guidance-text" id="recommendationText">Applicant displays a strong debt-to-income profile with minimal risk of charge-off. Recommended for automatic verification and loan origination.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 2: MODEL COMPARISON & CHART GALLERY    -->
+        <!-- ========================================== -->
+        <section class="tab-pane" id="tab-analytics">
+            
+            <div class="section-hero">
+                <div class="hero-left">
+                    <div class="badge-pill">
+                        <span class="pill-dot"></span>
+                        <span>Evaluation Benchmark</span>
+                    </div>
+                    <h1 class="hero-title">Decision Tree vs. Random Forest Benchmark</h1>
+                    <p class="hero-sub">Comparative diagnostics explaining why Balanced Accuracy and Macro F1 reveal the true champion on highly skewed lending data.</p>
+                </div>
+            </div>
+
+            <!-- KPI Comparison Head-to-Head Banner -->
+            <div class="h2h-grid">
+                <!-- Winning Model Card -->
+                <div class="h2h-card winner-card">
+                    <div class="h2h-tag">CHAMPION MODEL</div>
+                    <div class="h2h-name">Random Forest Classifier</div>
+                    <div class="h2h-sub">Ensemble (n=200, class_weight='balanced')</div>
+                    <div class="h2h-metric-row">
+                        <div class="h2h-stat">
+                            <span class="h2h-num text-green">41.00%</span>
+                            <span class="h2h-lbl">Macro F1 Score</span>
+                        </div>
+                        <div class="h2h-stat">
+                            <span class="h2h-num text-green">20.10%</span>
+                            <span class="h2h-lbl">Defaulter Recall (268 caught)</span>
+                        </div>
+                        <div class="h2h-stat">
+                            <span class="h2h-num text-green">40.09%</span>
+                            <span class="h2h-lbl">Balanced Accuracy</span>
+                        </div>
+                    </div>
+                    <div class="winner-reason">
+                        &#9733; <strong>Why it wins:</strong> Successfully detects <strong>20.1% of actual defaulters</strong>, more than doubling Decision Tree's detection rate while maintaining strong precision across all tiers.
+                    </div>
+                </div>
+
+                <!-- Baseline Model Card -->
+                <div class="h2h-card baseline-card">
+                    <div class="h2h-tag">BASELINE MODEL</div>
+                    <div class="h2h-name">Decision Tree Classifier</div>
+                    <div class="h2h-sub">Single Tree (Entropy, max_depth=12)</div>
+                    <div class="h2h-metric-row">
+                        <div class="h2h-stat">
+                            <span class="h2h-num">36.27%</span>
+                            <span class="h2h-lbl">Macro F1 Score</span>
+                        </div>
+                        <div class="h2h-stat">
+                            <span class="h2h-num text-red">9.00%</span>
+                            <span class="h2h-lbl">Defaulter Recall (120 caught)</span>
+                        </div>
+                        <div class="h2h-stat">
+                            <span class="h2h-num">36.07%</span>
+                            <span class="h2h-lbl">Balanced Accuracy</span>
+                        </div>
+                    </div>
+                    <div class="baseline-reason">
+                        &#9888; <strong>The Flaw:</strong> Higher raw accuracy (80.4%) is an illusion created by 83.3% majority class bias. Misses <strong>91% of loan charge-offs</strong>!
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Toolbar -->
+            <div class="gallery-toolbar">
+                <div class="filter-group">
+                    <span class="filter-title">Filter Analysis:</span>
+                    <button class="filter-chip active" data-filter="all">All Diagnostic Plots (5)</button>
+                    <button class="filter-chip" data-filter="performance">Performance & Metrics</button>
+                    <button class="filter-chip" data-filter="matrices">Confusion Matrices</button>
+                    <button class="filter-chip" data-filter="features">Feature Importance</button>
+                    <button class="filter-chip" data-filter="dataset">Data Imbalance</button>
+                </div>
+            </div>
+
+            <!-- Interactive Chart Cards Gallery -->
+            <div class="charts-masonry">
+                {% for chart in charts %}
+                <div class="visual-card" data-category="{{ chart.category }}">
+                    <div class="visual-card-top">
+                        <span class="visual-badge">{{ chart.category | upper }}</span>
+                        <h3 class="visual-title">{{ chart.title }}</h3>
+                        <p class="visual-sub">{{ chart.subtitle }}</p>
+                    </div>
+
+                    <div class="visual-image-box" role="button" tabindex="0" aria-label="Inspect {{ chart.title }} in high resolution">
+                        <img src="{{ url_for('serve_chart', filename=chart.filename) }}" alt="{{ chart.title }}" loading="lazy" class="visual-img">
+                        <div class="zoom-cue">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
+                            <span>Inspect High-Resolution (300 DPI)</span>
+                        </div>
+                    </div>
+
+                    <div class="visual-card-bottom">
+                        <div class="takeaway-head">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                            Key Evaluator Takeaway:
+                        </div>
+                        <p class="takeaway-body">{{ chart.insight }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 3: FINANCIAL RISK SIMULATOR           -->
+        <!-- ========================================== -->
+        <section class="tab-pane" id="tab-calculator">
+            
+            <div class="section-hero">
+                <div class="hero-left">
+                    <div class="badge-pill">
+                        <span class="pill-dot"></span>
+                        <span>Sensitivity Lab</span>
+                    </div>
+                    <h1 class="hero-title">Financial Sensitivity & Risk Simulator</h1>
+                    <p class="hero-sub">Experiment with Debt-to-Income thresholds and interest rate variations to understand the mathematical drivers of credit risk.</p>
+                </div>
+            </div>
+
+            <div class="calculator-grid">
+                <div class="glass-card calc-controls-card">
+                    <h3 class="panel-heading">Interactive Sensitivity Sliders</h3>
+                    <p class="panel-sub">Adjust variables below to see simulated risk sensitivity</p>
+
+                    <div class="calc-control-group">
+                        <div class="field-top">
+                            <label>Borrower Debt-to-Income (DTI)</label>
+                            <span class="field-hint text-blue" id="simDTIVal">18.0%</span>
+                        </div>
+                        <input type="range" id="simDTISlider" min="1" max="55" step="0.5" value="18" class="synced-range">
+                        <div class="range-scale">
+                            <span>0% Low</span>
+                            <span>20% Prime Threshold</span>
+                            <span>35% High Risk</span>
+                            <span>50%+ Severe</span>
+                        </div>
+                    </div>
+
+                    <div class="calc-control-group">
+                        <div class="field-top">
+                            <label>Loan Interest Rate (APR)</label>
+                            <span class="field-hint text-blue" id="simRateVal">12.5%</span>
+                        </div>
+                        <input type="range" id="simRateSlider" min="5" max="30" step="0.25" value="12.5" class="synced-range">
+                        <div class="range-scale">
+                            <span>5% Grade A</span>
+                            <span>12% Grade C</span>
+                            <span>20% Grade E</span>
+                            <span>28%+ Subprime</span>
+                        </div>
+                    </div>
+
+                    <div class="calc-control-group">
+                        <div class="field-top">
+                            <label>Monthly Installment to Income Burden</label>
+                            <span class="field-hint text-blue" id="simBurdenVal">8.0%</span>
+                        </div>
+                        <input type="range" id="simBurdenSlider" min="1" max="40" step="0.5" value="8" class="synced-range">
+                        <div class="range-scale">
+                            <span>&lt; 5% Comfortable</span>
+                            <span>15% Strained</span>
+                            <span>25%+ High Burden</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-card calc-feedback-card">
+                    <h3 class="panel-heading">Simulated Risk Impact</h3>
+                    <div class="sim-result-box" id="simResultBox">
+                        <div class="sim-meter-ring">
+                            <span class="sim-score-num" id="simScoreNum">19.4%</span>
+                            <span class="sim-score-lbl">Simulated Risk</span>
+                        </div>
+                        <div class="sim-tier-badge badge-prime" id="simTierBadge">LOW RISK TIER</div>
+                    </div>
+
+                    <div class="sim-insights-list">
+                        <div class="sim-insight-item">
+                            <div class="sim-dot dot-green" id="dotDTI"></div>
+                            <div>
+                                <strong>DTI Impact Factor:</strong>
+                                <span id="textDTIImpact">Safe debt capacity. Low pressure on monthly cash flow.</span>
+                            </div>
+                        </div>
+                        <div class="sim-insight-item">
+                            <div class="sim-dot dot-green" id="dotRate"></div>
+                            <div>
+                                <strong>Interest Rate Hazard:</strong>
+                                <span id="textRateImpact">Moderate APR. Standard debt compounding rate.</span>
+                            </div>
+                        </div>
+                        <div class="sim-insight-item">
+                            <div class="sim-dot dot-green" id="dotBurden"></div>
+                            <div>
+                                <strong>Monthly Cash Cushion:</strong>
+                                <span id="textBurdenImpact">Healthy disposable income retention after debt service.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- TAB 4: METHODOLOGY & BENCHMARK DOCS        -->
+        <!-- ========================================== -->
+        <section class="tab-pane" id="tab-methodology">
+            
+            <div class="section-hero">
+                <div class="hero-left">
+                    <div class="badge-pill">
+                        <span class="pill-dot"></span>
+                        <span>Technical Architecture</span>
+                    </div>
+                    <h1 class="hero-title">Model Architecture & Data Integrity Standards</h1>
+                    <p class="hero-sub">Deep dive into data leakage safeguards, target imbalance mitigation, and multiclass decision boundary formulation.</p>
+                </div>
+            </div>
+
+            <div class="methodology-grid">
+                <!-- Data Leakage Card -->
+                <div class="glass-card method-card">
+                    <div class="method-icon-wrap icon-amber">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                    </div>
+                    <h3 class="method-title">Anti-Data-Leakage Enforcement</h3>
+                    <p class="method-body">In credit datasets, columns like <code>total_payment</code>, <code>last_payment_date</code>, and <code>next_payment_date</code> reflect post-origination loan repayment actions. In practical deployment, these attributes do not exist when a new applicant walks in.</p>
+                    <p class="method-body">Our pipeline explicitly removes all post-origination fields, ensuring the models rely exclusively on origination-time indicators: <code>loan_amount</code>, <code>installment</code>, <code>int_rate</code>, <code>annual_income</code>, <code>dti</code>, and verification flags.</p>
+                </div>
+
+                <!-- Accuracy Paradox Card -->
+                <div class="glass-card method-card">
+                    <div class="method-icon-wrap icon-blue">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 3v18h18"/><path d="m19 9-5 5-4-4-3 3"/></svg>
+                    </div>
+                    <h3 class="method-title">The Imbalance "Accuracy Paradox"</h3>
+                    <p class="method-body">Because <strong>83.3% of applicants</strong> naturally pay off their loans, an algorithm that blindly approves 100% of loans achieves an astounding <strong>83.3% raw accuracy</strong> while catching <strong>zero defaulters</strong>.</p>
+                    <p class="method-body">In lending, a default causes an immediate severe capital loss. By switching our benchmark criteria to <strong>Balanced Accuracy</strong> and <strong>Macro F1-Score</strong>, we penalize models that fail to flag minority defaulters.</p>
+                </div>
+
+                <!-- Complete Metric Benchmark Table -->
+                <div class="glass-card method-card full-width">
+                    <div class="panel-header">
+                        <h3 class="panel-heading">Official Model Benchmark Table (Testing Set: 9,644 Samples)</h3>
+                    </div>
+                    <div class="table-container">
+                        <table class="benchmark-table">
+                            <thead>
+                                <tr>
+                                    <th>Evaluation Metric</th>
+                                    <th>Decision Tree (Depth=12)</th>
+                                    <th>Random Forest (n=200, Balanced)</th>
+                                    <th>Absolute Delta</th>
+                                    <th>Impact & Winner</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>Overall Accuracy</strong></td>
+                                    <td>80.39%</td>
+                                    <td>76.59%</td>
+                                    <td class="text-red">-3.80%</td>
+                                    <td><span class="badge-neutral">Majority Class Skew</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Balanced Accuracy</strong></td>
+                                    <td>36.07%</td>
+                                    <td><strong>40.09%</strong></td>
+                                    <td class="text-green">+4.02%</td>
+                                    <td><span class="badge-green-sm">Random Forest &#9733;</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Macro F1-Score</strong></td>
+                                    <td>36.27%</td>
+                                    <td><strong>41.00%</strong></td>
+                                    <td class="text-green">+4.73%</td>
+                                    <td><span class="badge-green-sm">Random Forest &#9733;</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Defaulter Recall (Charged Off)</strong></td>
+                                    <td>9.00% (120 caught)</td>
+                                    <td><strong>20.10% (268 caught)</strong></td>
+                                    <td class="text-green">+11.10% (2.2x)</td>
+                                    <td><span class="badge-green-sm">Random Forest &#9733;</span></td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Defaulter F1-Score</strong></td>
+                                    <td>12.90%</td>
+                                    <td><strong>20.90%</strong></td>
+                                    <td class="text-green">+8.00%</td>
+                                    <td><span class="badge-green-sm">Random Forest &#9733;</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ============================================== -->
+    <!-- HIGH-RESOLUTION LIGHTBOX MODAL                 -->
+    <!-- ============================================== -->
+    <div class="lightbox-modal" id="lightboxModal" onclick="closeLightbox(event)">
+        <div class="lightbox-content">
+            <button class="lightbox-close" onclick="closeLightbox(event)">&times;</button>
+            <h3 class="lightbox-title" id="lightboxTitle">Diagnostic Plot Inspection</h3>
+            <div class="lightbox-img-shell">
+                <img src="" alt="Enlarged Plot" id="lightboxImg" class="lightbox-img">
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

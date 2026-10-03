@@ -1,0 +1,22 @@
+# Python & Environments
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+venv/
+ENV/
+env/
+
+# IDE & Editor Configs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS Artifacts
+.DS_Store
+Thumbs.db
+
+# Optional large raw datasets (model artifacts in Models/ are already trained)
+# Uncomment if you don't need to push raw 11MB Excel files to GitHub:
+# Data/
