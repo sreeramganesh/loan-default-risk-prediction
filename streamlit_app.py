@@ -7,6 +7,8 @@ import numpy as np
 import streamlit as st
 from PIL import Image
 
+import streamlit.components.v1 as components
+
 # ==============================================================================
 # 1. Page Configuration & Theme
 # ==============================================================================
@@ -15,6 +17,31 @@ st.set_page_config(
     page_icon="🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
+)
+
+# WCAG 2.2 AA (1.4.4): Ensure mobile zooming/scaling is enabled by patching the meta viewport tag
+components.html(
+    """
+    <script>
+        (function() {
+            function enableZoom() {
+                try {
+                    const meta = window.parent.document.querySelector('meta[name="viewport"]');
+                    if (meta) {
+                        meta.setAttribute('content', 'width=device-width, initial-scale=1, shrink-to-fit=no');
+                    }
+                } catch (e) {
+                    // Fallback for cross-origin or restricted frames
+                }
+            }
+            enableZoom();
+            setTimeout(enableZoom, 400);
+            setTimeout(enableZoom, 1200);
+        })();
+    </script>
+    """,
+    height=0,
+    width=0
 )
 
 # Custom High-End Fintech Dark UI Styling
@@ -647,15 +674,15 @@ with st.sidebar:
 
 
 # ==============================================================================
-# 4. Hero Banner
+# 4. Hero Banner (WCAG 2.2 AA: Semantic Level-One Heading Landmark)
 # ==============================================================================
 st.markdown("""
-    <div class="hero-banner">
-        <h1 class="hero-title">Loan Verification & Default Risk Intelligence</h1>
+    <header class="hero-banner" role="banner" aria-labelledby="main-heading">
+        <h1 id="main-heading" class="hero-title" tabindex="-1">Loan Verification & Default Risk Intelligence</h1>
         <p class="hero-sub">
             Real-time machine learning underwriting engine trained on 38,574 credit histories. Evaluates applicant creditworthiness, computes debt stress indicators, and automates loan verification recommendations.
         </p>
-    </div>
+    </header>
 """, unsafe_allow_html=True)
 
 
