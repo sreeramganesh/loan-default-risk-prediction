@@ -1142,13 +1142,36 @@ with tab_simulator:
     st.markdown("## ⚡ Financial Sensitivity & Shock Stress Test")
     st.markdown("Simulate how macroeconomic shifts (interest rate hikes, income shocks, inflation) impact borrower default probability in real time.")
 
+    # Plain-English User Guide Card
+    st.markdown("""
+        <div style="background: rgba(56, 189, 248, 0.08); border: 1px solid rgba(56, 189, 248, 0.25); border-radius: var(--radius-md); padding: 12px 18px; margin: 12px 0 20px 0;">
+            <strong style="color: var(--color-text-accent);">💡 How to test this:</strong>
+            <span style="color: var(--color-text-primary); font-size: var(--font-size-sm); margin-left: 6px;">
+                This lab answers: <em>"Can this borrower still afford their loan if bad economic events happen?"</em>
+                Move the sliders on the left (e.g. simulate a 15% salary cut or interest rate hike) and watch the AI risk score adjust on the right in real time.
+            </span>
+        </div>
+    """, unsafe_allow_html=True)
+
     sim_col1, sim_col2 = st.columns([1, 1], gap="large")
 
     with sim_col1:
         st.markdown("### 🎛️ Scenario Adjusters")
-        rate_shock = st.slider("Fed Rate Hike Delta (+% APR)", 0.0, 10.0, 2.5, 0.25)
-        income_shock = st.slider("Income Shock Delta (% Change)", -50.0, 30.0, -15.0, 5.0)
-        dti_shock = st.slider("DTI Inflation Delta (+% Ratio)", 0.0, 25.0, 6.0, 1.0)
+        rate_shock = st.slider(
+            "📈 Interest Rate Hike (+% APR)",
+            0.0, 10.0, 2.5, 0.25,
+            help="Simulate if market interest rates rise (e.g., +2.5%). This increases the applicant's required monthly payment."
+        )
+        income_shock = st.slider(
+            "💼 Borrower Salary Change (% Income)",
+            -50.0, 30.0, -15.0, 5.0,
+            help="Simulate a salary pay cut (e.g., -15%) or pay raise (+%). Tests if the borrower can survive reduced earnings."
+        )
+        dti_shock = st.slider(
+            "💳 Debt Burden Increase (+% DTI)",
+            0.0, 25.0, 6.0, 1.0,
+            help="DTI = Debt-to-Income ratio. Simulates higher living costs, inflation, or extra credit card debt (e.g., +6%)."
+        )
 
     # Baseline comparison values
     base_loan = 25000.0
@@ -1167,6 +1190,7 @@ with tab_simulator:
 
     with sim_col2:
         st.markdown("### 📊 Stress-Tested Impact")
+        st.caption("Real-time re-inference by Random Forest under adverse economic stress")
         
         # Run inference on baseline vs stressed
         def predict_risk(l_amt, inst, r, inc, d):
