@@ -289,10 +289,24 @@ def get_metrics():
     })
 
 
+@app.route("/health")
+def health():
+    """Health check endpoint for Render/cloud deployment monitoring."""
+    is_healthy = model is not None and target_encoder is not None
+    return jsonify({
+        "status": "healthy" if is_healthy else "degraded",
+        "service": "LoanGuard AI Flask Service",
+        "model_loaded": is_healthy
+    }), 200 if is_healthy else 503
+
+
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
+    debug_mode = os.environ.get("FLASK_DEBUG", "False").lower() in ("true", "1")
     print(f"\n=================================================")
     print(f" Loan Verification & Prediction Server Active")
-    print(f" Open your browser: http://127.0.0.1:{port}")
+    print(f" Listening on http://0.0.0.0:{port} (local: http://127.0.0.1:{port})")
+    print(f" Debug mode: {debug_mode}")
     print(f"=================================================\n")
-    app.run(debug=True, host="127.0.0.1", port=port)
+    app.run(debug=debug_mode, host="0.0.0.0", port=port)
+
