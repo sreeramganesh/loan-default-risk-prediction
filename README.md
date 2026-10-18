@@ -128,9 +128,25 @@ flowchart TD
 
 ---
 
-## 8. Machine Learning Model & Performance
+## 8. Machine Learning Model & Diagnostic Visualizations
 
 The core decision engine is powered by an ensemble **Random Forest Classifier** selected after benchmark evaluation against baseline Decision Trees on a historical dataset of 38,574 loan records.
+
+### 8.1 Dataset Class Distribution & Severe Imbalance
+> **The Problem:** 83.3% of applicants in the historical portfolio are `Fully Paid` while only 13.8% are `Charged Off`. A naive model predicting `Fully Paid` 100% of the time achieves 83.3% accuracy but catches 0% of defaults. Addressing this severe imbalance required evaluating models via **Balanced Accuracy**, **Macro F1-Score**, and **Defaulter Recall**.
+
+<p align="center">
+  <img src="src/images/Target_Class_Distribution.png" alt="Loan Status Class Distribution & Imbalance" width="90%">
+</p>
+
+---
+
+### 8.2 Normalized Confusion Matrix Comparison (True Detection Rates)
+> **The Solution:** In credit underwriting, false negatives on delinquent borrowers lead directly to severe capital charge-offs. Random Forest achieves **20.1% recall on actual defaulters (`Charged Off`)**, more than doubling the baseline Decision Tree's **9.0%** detection rate (+123% improvement).
+
+<p align="center">
+  <img src="src/images/Model_Comparison_Confusion_Matrices.png" alt="Normalized Confusion Matrix Comparison" width="95%">
+</p>
 
 | Evaluation Metric | Baseline Decision Tree | Random Forest Classifier | Performance Advantage |
 |---|---|---|---|
@@ -140,7 +156,14 @@ The core decision engine is powered by an ensemble **Random Forest Classifier** 
 | **Macro F1-Score** | 36.27% | **41.00%** | **+4.73% Global Precision/Recall** |
 | **Overall Accuracy** | 80.39% | **76.59%** | *Fair trade-off for catching 2.2x more defaults* |
 
-*Why Recall Matters:* In credit risk analysis, raw overall accuracy is deceptive due to the heavy 83.3% `Fully Paid` class majority. A naive model predicting `Fully Paid` 100% of the time achieves 83% accuracy but catches 0% of defaulters. Random Forest achieves more than double the detection rate on actual charge-offs, mitigating severe financial lender losses.
+---
+
+### 8.3 Dual Feature Importance & Model Explainability (XAI)
+> **Explainability:** Regulatory compliance (FCRA, ECOA) requires lending models to be interpretable. Ranking feature importances confirms the model relies on sound economic fundamentals: **assigned interest rate (`int_rate`)**, **monthly payment obligation (`installment`)**, and **debt-to-income ratio (`dti`)** account for over 65% of the total predictive power.
+
+<p align="center">
+  <img src="src/images/Feature_Importance_Comparison.png" alt="Feature Importance Comparison" width="90%">
+</p>
 
 ---
 
