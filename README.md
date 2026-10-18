@@ -3,7 +3,6 @@
 [![Render Status](https://img.shields.io/badge/Render-Live%20Production-46E3B7.svg?style=for-the-badge&logo=render&logoColor=white)](https://loan-default-risk-prediction-ro68.onrender.com)
 [![Python Version](https://img.shields.io/badge/Python-3.11-3776AB.svg?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
 [![Flask Framework](https://img.shields.io/badge/Flask-3.0+-000000.svg?style=for-the-badge&logo=flask&logoColor=white)](https://flask.palletsprojects.com)
-[![Scikit-Learn](https://img.shields.io/badge/scikit--learn-1.4+-F7931E.svg?style=for-the-badge&logo=scikit-learn&logoColor=white)](https://scikit-learn.org)
 [![Gunicorn WSGI](https://img.shields.io/badge/Gunicorn-WSGI-499848.svg?style=for-the-badge&logo=gunicorn&logoColor=white)](https://gunicorn.org)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg?style=for-the-badge)](LICENSE)
 
@@ -232,7 +231,6 @@ loan-default-risk-prediction/
 ├── Procfile                        # Render / Cloud WSGI startup declaration
 ├── requirements.txt                # Production Python dependencies
 ├── RENDER_DEPLOYMENT_GUIDE.md      # Step-by-step cloud deployment manual
-├── STREAMLIT_REMOVAL_AUDIT.md      # Streamlit deprecation audit report
 ├── LICENSE                         # MIT License
 └── README.md                       # Project documentation
 ```
