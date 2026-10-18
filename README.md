@@ -9,8 +9,7 @@
 ---
 
 ### 🌐 Live Production Application
-> **Live Web Application:** [https://loan-default-risk-prediction-ro68.onrender.com](https://loan-default-risk-prediction-ro68.onrender.com)  
-> **Live Service Health Check:** [https://loan-default-risk-prediction-ro68.onrender.com/health](https://loan-default-risk-prediction-ro68.onrender.com/health)  
+> **Live Web Application:** [https://loan-default-risk-prediction-ro68.onrender.com](https://loan-default-risk-prediction-ro68.onrender.com)    
 > **Official GitHub Repository:** [https://github.com/sreeramganesh/loan-default-risk-prediction](https://github.com/sreeramganesh/loan-default-risk-prediction)
 
 *Note on Free Tier Hosting: This application is hosted on Render's Free Web Service tier. If the application has been inactive for 15 minutes, the instance automatically sleeps. The first request after sleep initiates a cold start, which may take 30–50 seconds to spin up the container and load the machine learning model into memory. Subsequent requests respond with sub-second latency.*
