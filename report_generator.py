@@ -648,6 +648,7 @@ def generate_excel_report(report_data):
     # Save to BytesIO
     excel_buffer = io.BytesIO()
     wb.save(excel_buffer)
+    wb.close()
     excel_buffer.seek(0)
     return excel_buffer
 
