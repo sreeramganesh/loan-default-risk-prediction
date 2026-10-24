@@ -238,6 +238,57 @@ def export_excel_report():
         }), 500
 
 
+@app.route("/api/debug/test_excel")
+def debug_test_excel():
+    """Diagnostic endpoint to verify openpyxl on Render."""
+    import traceback
+    import io
+    steps = []
+    try:
+        steps.append("1. start")
+        import openpyxl
+        steps.append(f"2. openpyxl imported: {openpyxl.__version__}")
+        wb = openpyxl.Workbook()
+        steps.append("3. workbook created")
+        ws = wb.active
+        ws["A1"] = "Test"
+        steps.append("4. cell set")
+        buf = io.BytesIO()
+        wb.save(buf)
+        steps.append(f"5. saved bytes: {len(buf.getvalue())}")
+        return jsonify({"status": "ok", "steps": steps})
+    except Exception as e:
+        return jsonify({"status": "error", "steps": steps, "error": str(e), "trace": traceback.format_exc()}), 500
+
+
+@app.route("/api/debug/full_excel")
+def debug_full_excel():
+    """Diagnostic endpoint to verify full generate_excel_report on Render."""
+    import traceback
+    steps = []
+    try:
+        steps.append("1. dummy payload")
+        dummy = {
+            "loan_amount": 10000.0,
+            "installment": 308.50,
+            "int_rate": 6.89,
+            "annual_income": 95000.0,
+            "dti": 11.2,
+            "application_type": "INDIVIDUAL",
+            "verification_status": "Verified",
+            "home_ownership": "MORTGAGE"
+        }
+        assessment = validate_and_assess(dummy, model, target_encoder, feature_encoders, FEATURE_COLUMNS)
+        steps.append("2. assessed")
+        report_data = build_report_data(assessment)
+        steps.append("3. report_data built")
+        excel_buffer = generate_excel_report(report_data)
+        steps.append(f"4. excel generated: {len(excel_buffer.getvalue())} bytes")
+        return jsonify({"status": "ok", "steps": steps})
+    except Exception as e:
+        return jsonify({"status": "error", "steps": steps, "error": str(e), "trace": traceback.format_exc()}), 500
+
+
 @app.route("/api/reports/csv", methods=["POST"])
 def export_csv_report():
     """Generates and downloads an audit-ready 2-column CSV report (.csv)."""
