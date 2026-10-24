@@ -263,11 +263,13 @@ def debug_test_excel():
 
 @app.route("/api/debug/full_excel")
 def debug_full_excel():
-    """Diagnostic endpoint to verify full generate_excel_report on Render."""
+    """Diagnostic endpoint to verify full generate_excel_report on Render with timings."""
     import traceback
+    import time
+    t0 = time.time()
     steps = []
     try:
-        steps.append("1. dummy payload")
+        steps.append(f"1. dummy payload ({time.time()-t0:.3f}s)")
         dummy = {
             "loan_amount": 10000.0,
             "installment": 308.50,
@@ -279,14 +281,57 @@ def debug_full_excel():
             "home_ownership": "MORTGAGE"
         }
         assessment = validate_and_assess(dummy, model, target_encoder, feature_encoders, FEATURE_COLUMNS)
-        steps.append("2. assessed")
+        steps.append(f"2. assessed ({time.time()-t0:.3f}s)")
         report_data = build_report_data(assessment)
-        steps.append("3. report_data built")
+        steps.append(f"3. report_data built ({time.time()-t0:.3f}s)")
         excel_buffer = generate_excel_report(report_data)
-        steps.append(f"4. excel generated: {len(excel_buffer.getvalue())} bytes")
-        return jsonify({"status": "ok", "steps": steps})
+        steps.append(f"4. excel generated ({time.time()-t0:.3f}s): {len(excel_buffer.getvalue())} bytes")
+        return jsonify({"status": "ok", "steps": steps, "total_time": time.time()-t0})
     except Exception as e:
         return jsonify({"status": "error", "steps": steps, "error": str(e), "trace": traceback.format_exc()}), 500
+
+
+@app.route("/api/debug/excel_step/<int:step_num>")
+def debug_excel_step(step_num):
+    """Executes up to step_num to pinpoint exact failure point."""
+    import traceback
+    import time
+    import openpyxl
+    t0 = time.time()
+    dummy = {
+        "loan_amount": 10000.0,
+        "installment": 308.50,
+        "int_rate": 6.89,
+        "annual_income": 95000.0,
+        "dti": 11.2,
+        "application_type": "INDIVIDUAL",
+        "verification_status": "Verified",
+        "home_ownership": "MORTGAGE"
+    }
+    assessment = validate_and_assess(dummy, model, target_encoder, feature_encoders, FEATURE_COLUMNS)
+    report_data = build_report_data(assessment)
+
+    if step_num == 1:
+        return jsonify({"step": 1, "msg": "Assessed & built data", "time": time.time()-t0})
+
+    wb = openpyxl.Workbook()
+    if step_num == 2:
+        return jsonify({"step": 2, "msg": "Workbook created", "time": time.time()-t0})
+
+    # Test sheet 1
+    ws1 = wb.active
+    ws1.title = "LOAN ASSESSMENT"
+    ws1.views.sheetView[0].showGridLines = True
+    ws1["A1"] = "Title"
+    if step_num == 3:
+        buf = io.BytesIO()
+        wb.save(buf)
+        return jsonify({"step": 3, "msg": "Sheet 1 basic saved", "bytes": len(buf.getvalue()), "time": time.time()-t0})
+
+    # Test full sheet 1
+    from report_generator import generate_excel_report
+    buf = generate_excel_report(report_data)
+    return jsonify({"step": 4, "msg": "Full generate_excel_report completed", "bytes": len(buf.getvalue()), "time": time.time()-t0})
 
 
 @app.route("/api/reports/csv", methods=["POST"])
