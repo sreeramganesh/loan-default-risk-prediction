@@ -2,11 +2,17 @@
  * LoanGuard AI — High-Impact Interactive Frontend Logic
  */
 
+// Application state for assessment reports
+let latestAssessmentResult = null;
+let latestInputPayload = null;
+let isReportDownloading = false;
+
 document.addEventListener('DOMContentLoaded', () => {
     initNavigationTabs();
     initSyncedSliders();
     initPresets();
     initFormSubmission();
+    initReportDownloads();
     initSensitivitySimulator();
     initChartFilters();
     initLightbox();
@@ -211,6 +217,7 @@ function initPresets() {
             const resultsContainer = document.getElementById('resultsContainer');
             if (emptyState) emptyState.style.display = 'flex';
             if (resultsContainer) resultsContainer.style.display = 'none';
+            resetReportState();
         });
     }
 }
@@ -247,6 +254,7 @@ function initFormSubmission() {
 
         btnSubmit.classList.add('loading');
         btnSubmit.disabled = true;
+        setReportButtonsEnabled(false);
 
         try {
             const response = await fetch('/predict', {
@@ -258,11 +266,16 @@ function initFormSubmission() {
             const result = await response.json();
 
             if (response.ok && result.status === 'success') {
+                latestAssessmentResult = result;
+                latestInputPayload = payload;
                 renderResults(result);
+                updateReportSection(result);
             } else {
+                resetReportState();
                 alert(`Assessment Error: ${result.message || 'Unable to process applicant credit data.'}`);
             }
         } catch (error) {
+            resetReportState();
             console.error('Fetch error:', error);
             alert('Unable to connect to Flask server. Please verify that app.py is running.');
         } finally {
@@ -355,6 +368,149 @@ function renderResults(data) {
 
     // 5. Underwriting Guidance
     document.getElementById('recommendationText').textContent = data.recommendation;
+}
+
+// ============================================================
+// 4B. Assessment Report Generation & Downloads
+// ============================================================
+function initReportDownloads() {
+    const btnExcel = document.getElementById('btnDownloadExcel');
+    const btnCsv = document.getElementById('btnDownloadCsv');
+
+    if (btnExcel) {
+        btnExcel.addEventListener('click', () => downloadReport('excel'));
+    }
+    if (btnCsv) {
+        btnCsv.addEventListener('click', () => downloadReport('csv'));
+    }
+
+    setReportButtonsEnabled(false);
+}
+
+function setReportButtonsEnabled(enabled) {
+    const btnExcel = document.getElementById('btnDownloadExcel');
+    const btnCsv = document.getElementById('btnDownloadCsv');
+    const badge = document.getElementById('reportIdBadge');
+    const feedback = document.getElementById('reportFeedbackMsg');
+
+    if (btnExcel) btnExcel.disabled = !enabled;
+    if (btnCsv) btnCsv.disabled = !enabled;
+
+    if (!enabled) {
+        if (badge) badge.textContent = 'Awaiting Assessment';
+        if (feedback) feedback.style.display = 'none';
+    }
+}
+
+function updateReportSection(data) {
+    setReportButtonsEnabled(true);
+    const badge = document.getElementById('reportIdBadge');
+    if (badge && data.report_id) {
+        badge.textContent = `ID: ${data.report_id}`;
+    }
+    const feedback = document.getElementById('reportFeedbackMsg');
+    if (feedback) {
+        feedback.style.display = 'none';
+        feedback.textContent = '';
+        feedback.className = 'report-feedback-msg';
+    }
+}
+
+function resetReportState() {
+    latestAssessmentResult = null;
+    latestInputPayload = null;
+    setReportButtonsEnabled(false);
+}
+
+async function downloadReport(format) {
+    if (isReportDownloading) return;
+
+    if (!latestAssessmentResult || !latestInputPayload) {
+        showReportFeedback('Please execute a loan risk assessment before downloading a report.', 'error');
+        return;
+    }
+
+    const btn = format === 'excel'
+        ? document.getElementById('btnDownloadExcel')
+        : document.getElementById('btnDownloadCsv');
+    const endpoint = format === 'excel' ? '/api/reports/excel' : '/api/reports/csv';
+
+    isReportDownloading = true;
+    if (btn) btn.classList.add('loading');
+    showReportFeedback(`Generating ${format.toUpperCase()} assessment report...`, 'info');
+
+    try {
+        const payload = {
+            ...latestInputPayload,
+            report_id: latestAssessmentResult.report_id,
+            timestamp: latestAssessmentResult.timestamp
+        };
+
+        const response = await fetch(endpoint, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(payload)
+        });
+
+        if (!response.ok) {
+            let errorMsg = 'Failed to generate report.';
+            try {
+                const errJson = await response.json();
+                errorMsg = errJson.message || errorMsg;
+            } catch (_) {}
+            throw new Error(errorMsg);
+        }
+
+        // Determine filename
+        let filename = `LoanGuard_AI_Assessment_${latestAssessmentResult.report_id || 'Report'}.${format === 'excel' ? 'xlsx' : 'csv'}`;
+        const disposition = response.headers.get('Content-Disposition');
+        if (disposition && disposition.includes('filename=')) {
+            const matches = /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/.exec(disposition);
+            if (matches && matches[1]) {
+                filename = matches[1].replace(/['"]/g, '').trim();
+            }
+        }
+
+        const blob = await response.blob();
+        const downloadUrl = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.style.display = 'none';
+        a.href = downloadUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+
+        // Cleanup
+        setTimeout(() => {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(downloadUrl);
+        }, 200);
+
+        showReportFeedback(`${format.toUpperCase()} report successfully downloaded: ${filename}`, 'success');
+
+    } catch (err) {
+        console.error('Report download error:', err);
+        showReportFeedback(`Report Generation Failed: ${err.message}`, 'error');
+    } finally {
+        isReportDownloading = false;
+        if (btn) btn.classList.remove('loading');
+    }
+}
+
+function showReportFeedback(msg, type) {
+    const feedback = document.getElementById('reportFeedbackMsg');
+    if (!feedback) return;
+    feedback.textContent = msg;
+    feedback.style.display = 'block';
+    if (type === 'error') {
+        feedback.className = 'report-feedback-msg error';
+    } else if (type === 'success') {
+        feedback.className = 'report-feedback-msg success';
+    } else {
+        feedback.className = 'report-feedback-msg';
+    }
 }
 
 // ============================================================

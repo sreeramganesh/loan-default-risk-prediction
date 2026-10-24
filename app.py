@@ -3,8 +3,14 @@ from pathlib import Path
 import joblib
 import pandas as pd
 import numpy as np
-from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask import Flask, render_template, request, jsonify, send_from_directory, send_file
 from flask_cors import CORS
+from report_generator import (
+    validate_and_assess,
+    build_report_data,
+    generate_excel_report,
+    generate_csv_report
+)
 
 app = Flask(__name__)
 CORS(app)
@@ -121,142 +127,166 @@ def predict():
         }), 500
 
     try:
-        data = request.get_json(force=True)
-
-        # 1. Parse and validate numeric features
         try:
-            loan_amount = float(data.get("loan_amount", 0))
-            installment = float(data.get("installment", 0))
-            int_rate = float(data.get("int_rate", 0))
-            annual_income = float(data.get("annual_income", 0))
-            dti = float(data.get("dti", 0))
-        except (ValueError, TypeError) as e:
+            data = request.get_json(force=True) if (request.is_json or request.data) else {}
+        except Exception:
             return jsonify({
                 "status": "error",
-                "message": f"Invalid numeric input provided: {e}"
+                "message": "Malformed or invalid JSON payload received."
             }), 400
 
-        # Input sanitization
-        if loan_amount <= 0 or annual_income <= 0:
+        if not isinstance(data, dict):
             return jsonify({
                 "status": "error",
-                "message": "Loan Amount and Annual Income must be greater than zero."
+                "message": "Request payload must be a JSON object."
             }), 400
 
-        # Convert percentages if user entered 12.5 instead of 0.125
-        if int_rate > 1.0:
-            int_rate_normalized = int_rate / 100.0
-        else:
-            int_rate_normalized = int_rate
-
-        if dti > 1.0:
-            dti_normalized = dti / 100.0
-        else:
-            dti_normalized = dti
-
-        # 2. Parse and encode categorical features
-        app_type = str(data.get("application_type", "INDIVIDUAL")).strip()
-        ver_status = str(data.get("verification_status", "Not Verified")).strip()
-        home_own = str(data.get("home_ownership", "RENT")).strip()
-
-        def safe_encode(col_name, val):
-            if col_name in feature_encoders:
-                enc = feature_encoders[col_name]
-                if val in enc.classes_:
-                    return int(enc.transform([val])[0])
-                else:
-                    return 0
-            return 0
-
-        app_type_enc = safe_encode("application_type", app_type)
-        ver_status_enc = safe_encode("verification_status", ver_status)
-        home_own_enc = safe_encode("home_ownership", home_own)
-
-        # 3. Construct DataFrame matching model columns exactly
-        input_data = {
-            "loan_amount": [loan_amount],
-            "installment": [installment],
-            "int_rate": [int_rate_normalized],
-            "annual_income": [annual_income],
-            "dti": [dti_normalized],
-            "application_type": [app_type_enc],
-            "verification_status": [ver_status_enc],
-            "home_ownership": [home_own_enc]
-        }
-        input_df = pd.DataFrame(input_data)[FEATURE_COLUMNS]
-
-        # 4. Model Prediction
-        pred_idx = model.predict(input_df)[0]
-        prediction_label = target_encoder.inverse_transform([pred_idx])[0]
-
-        # Calculate class probabilities
-        probabilities = {}
-        if hasattr(model, "predict_proba"):
-            probs = model.predict_proba(input_df)[0]
-            for cls_name, prob in zip(target_encoder.classes_, probs):
-                probabilities[cls_name] = round(float(prob) * 100, 2)
-        else:
-            # Fallback if probability not supported
-            probabilities = {
-                "Fully Paid": 85.0 if prediction_label == "Fully Paid" else 15.0,
-                "Charged Off": 85.0 if prediction_label == "Charged Off" else 15.0,
-                "Current": 0.0
-            }
-
-        # 5. Risk Assessment Logic
-        default_prob = probabilities.get("Charged Off", 0.0)
-        current_prob = probabilities.get("Current", 0.0)
-        fully_paid_prob = probabilities.get("Fully Paid", 0.0)
-
-        # Financial health metrics
-        monthly_burden = (installment * 12 / annual_income * 100) if annual_income > 0 else 0
-        loan_to_income = (loan_amount / annual_income * 100) if annual_income > 0 else 0
-
-        # Decision Matrix
-        if prediction_label == "Fully Paid" and default_prob < 30.0:
-            decision = "VERIFIED & APPROVED"
-            decision_badge = "success"
-            risk_tier = "Low Risk"
-            recommendation = "Applicant displays a strong debt-to-income profile with minimal risk of charge-off. Recommended for automatic verification and loan origination."
-        elif prediction_label == "Charged Off" or default_prob >= 35.0:
-            decision = "REJECTED (HIGH DEFAULT RISK)"
-            decision_badge = "danger"
-            risk_tier = "High Risk"
-            recommendation = "High probability of default detected. Key drivers include high debt-to-income burden and elevated interest tier. Verification rejected."
-        else:
-            decision = "MANUAL UNDERWRITER REVIEW"
-            decision_badge = "warning"
-            risk_tier = "Moderate Risk"
-            recommendation = "Applicant falls into a borderline risk bracket. Secondary income verification, credit pull, and collateral assessment recommended before disbursement."
+        assessment = validate_and_assess(data, model, target_encoder, feature_encoders, FEATURE_COLUMNS)
+        report_meta = build_report_data(
+            assessment,
+            custom_report_id=data.get("report_id"),
+            custom_timestamp=data.get("timestamp")
+        )
 
         return jsonify({
             "status": "success",
-            "decision": decision,
-            "decision_badge": decision_badge,
-            "risk_tier": risk_tier,
-            "predicted_class": prediction_label,
-            "default_risk_percentage": default_prob,
-            "recommendation": recommendation,
+            "report_id": report_meta["report_id"],
+            "timestamp": report_meta["timestamp"],
+            "decision": assessment["decision"],
+            "decision_badge": assessment["decision_badge"],
+            "risk_tier": assessment["risk_tier"],
+            "predicted_class": assessment["predicted_class"],
+            "default_risk_percentage": assessment["default_risk_percentage"],
+            "recommendation": assessment["recommendation"],
             "probabilities": {
-                "Fully Paid": fully_paid_prob,
-                "Charged Off": default_prob,
-                "Current": current_prob
+                "Fully Paid": assessment["fully_paid_percentage"],
+                "Charged Off": assessment["default_risk_percentage"],
+                "Current": assessment["current_percentage"]
             },
             "financial_summary": {
-                "loan_amount": f"${loan_amount:,.2f}",
-                "annual_income": f"${annual_income:,.2f}",
-                "installment": f"${installment:,.2f}/mo",
-                "interest_rate": f"{int_rate_normalized * 100:.2f}%",
-                "dti_ratio": f"{dti_normalized * 100:.1f}%",
-                "monthly_burden_pct": f"{monthly_burden:.1f}%",
-                "loan_to_income_pct": f"{loan_to_income:.1f}%"
+                "loan_amount": f"${assessment['loan_amount']:,.2f}",
+                "annual_income": f"${assessment['annual_income']:,.2f}",
+                "installment": f"${assessment['installment']:,.2f}/mo",
+                "interest_rate": f"{assessment['int_rate_pct']:.2f}%",
+                "dti_ratio": f"{assessment['dti_pct']:.1f}%",
+                "monthly_burden_pct": f"{assessment['monthly_burden_pct']:.1f}%",
+                "loan_to_income_pct": f"{assessment['loan_to_income_pct']:.1f}%"
             }
         })
 
+    except ValueError as ve:
+        return jsonify({
+            "status": "error",
+            "message": str(ve)
+        }), 400
     except Exception as e:
         return jsonify({
             "status": "error",
             "message": f"Server encountered an error during prediction: {str(e)}"
+        }), 500
+
+
+@app.route("/api/reports/excel", methods=["POST"])
+def export_excel_report():
+    """Generates and downloads an audit-ready 3-sheet Excel report (.xlsx)."""
+    if model is None or target_encoder is None:
+        return jsonify({
+            "status": "error",
+            "message": "Model artifacts not loaded. Please ensure models are trained and saved in Models/."
+        }), 500
+
+    try:
+        try:
+            data = request.get_json(force=True) if (request.is_json or request.data) else {}
+        except Exception:
+            return jsonify({
+                "status": "error",
+                "message": "Malformed or invalid JSON payload received."
+            }), 400
+
+        if not isinstance(data, dict):
+            return jsonify({
+                "status": "error",
+                "message": "Request payload must be a JSON object."
+            }), 400
+
+        assessment = validate_and_assess(data, model, target_encoder, feature_encoders, FEATURE_COLUMNS)
+        report_data = build_report_data(
+            assessment,
+            custom_report_id=data.get("report_id"),
+            custom_timestamp=data.get("timestamp")
+        )
+        excel_buffer = generate_excel_report(report_data)
+        safe_filename = f"LoanGuard_AI_Assessment_{report_data['report_id']}.xlsx"
+
+        return send_file(
+            excel_buffer,
+            mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+            as_attachment=True,
+            download_name=safe_filename
+        )
+
+    except ValueError as ve:
+        return jsonify({
+            "status": "error",
+            "message": str(ve)
+        }), 400
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": f"Report generation failed: {str(e)}"
+        }), 500
+
+
+@app.route("/api/reports/csv", methods=["POST"])
+def export_csv_report():
+    """Generates and downloads an audit-ready 2-column CSV report (.csv)."""
+    if model is None or target_encoder is None:
+        return jsonify({
+            "status": "error",
+            "message": "Model artifacts not loaded. Please ensure models are trained and saved in Models/."
+        }), 500
+
+    try:
+        try:
+            data = request.get_json(force=True) if (request.is_json or request.data) else {}
+        except Exception:
+            return jsonify({
+                "status": "error",
+                "message": "Malformed or invalid JSON payload received."
+            }), 400
+
+        if not isinstance(data, dict):
+            return jsonify({
+                "status": "error",
+                "message": "Request payload must be a JSON object."
+            }), 400
+
+        assessment = validate_and_assess(data, model, target_encoder, feature_encoders, FEATURE_COLUMNS)
+        report_data = build_report_data(
+            assessment,
+            custom_report_id=data.get("report_id"),
+            custom_timestamp=data.get("timestamp")
+        )
+        csv_buffer = generate_csv_report(report_data)
+        safe_filename = f"LoanGuard_AI_Assessment_{report_data['report_id']}.csv"
+
+        return send_file(
+            csv_buffer,
+            mimetype="text/csv; charset=utf-8",
+            as_attachment=True,
+            download_name=safe_filename
+        )
+
+    except ValueError as ve:
+        return jsonify({
+            "status": "error",
+            "message": str(ve)
+        }), 400
+    except Exception as e:
+        return jsonify({
+            "status": "error",
+            "message": f"Report generation failed: {str(e)}"
         }), 500
 
 

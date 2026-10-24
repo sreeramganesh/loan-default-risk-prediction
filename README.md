@@ -216,7 +216,75 @@ The `/predict` endpoint returns a structured JSON payload:
 
 ---
 
-## 11. Project Folder Structure
+## 11. Loan Risk Assessment Report Generation (Excel & CSV)
+
+LoanGuard AI features an automated **Credit Underwriting Risk Assessment Report Generation** engine. After executing an applicant evaluation, underwriters can export the complete audit dossier in two formats:
+
+1. **Excel Workbook (`.xlsx`)**: A 3-sheet workbook with custom typography, dark navy and cyan styling, frozen headers, currency formatting, percentage scaling, and underwriting verification checklists.
+2. **CSV Export (`.csv`)**: A standardized, UTF-8 encoded two-column (`Field,Value`) data feed suitable for integration with downstream loan origination systems (LOS) and core banking databases.
+
+### 11.1 Report Contents Breakdown
+
+Each generated report contains actual model inferences and server-validated calculations:
+
+| Section | Key Data Points Included |
+|---|---|
+| **01. Report Metadata** | Unique Report ID (`LGA-YYYYMMDD-XXXX`), UTC Timestamp, Project Name, Author, Model Architecture (`Random Forest Balanced`, 200 trees). |
+| **02. Loan Parameters** | Requested Loan Amount ($), Monthly Installment ($/mo), Interest Rate (APR %), Stated Purpose, Application Type. |
+| **03. Borrower Financial Profile** | Gross Annual Income ($), Gross Monthly Income ($), Debt-to-Income Ratio (DTI %), Monthly Debt Burden (%), Loan-to-Income Multiple. |
+| **04. Verification & Collateral** | Home Ownership Status, Income Verification Depth, Underwriter Document Verification Guidance. |
+| **05. Machine Learning Assessment** | Predicted Class (`Fully Paid`, `Charged Off`, `Current`), Default Probability (%), Paid Probability (%), Active Grace Probability (%), Decision Badge, Risk Tier. |
+| **06. Guidance & Compliance** | Model-driven Actionable Underwriter Guidance, Verification Checklist, Model Assumptions, Regulatory ECOA / Fair Lending Disclaimers. |
+
+### 11.2 Excel Workbook Structure (3 Worksheets)
+
+- **Sheet 1: `LOAN ASSESSMENT`** — Executive underwriting decision banner, loan facility terms, borrower financial inputs, and verified collateral profile.
+- **Sheet 2: `RISK ANALYSIS`** — Multiclass probability breakdown, policy risk threshold benchmarks (< 30% Auto-Approve, 30–35% Manual Review, >= 35% Reject), and debt ratio health indicators.
+- **Sheet 3: `RECOMMENDATIONS`** — Actionable underwriter notes, KYC/CIP identity checklists, credit obligation review items, and regulatory compliance disclaimers.
+
+### 11.3 Report Generation API Endpoints
+
+Both report endpoints accept the loan applicant parameters via `POST` JSON, execute server-side validation and inference with the trained model, and stream the generated file in-memory using `io.BytesIO`:
+
+#### 1. Export Excel Assessment Report
+- **Endpoint**: `POST /api/reports/excel`
+- **Content-Type**: `application/json`
+- **Response MIME Type**: `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`
+- **Default Filename**: `LoanGuard_AI_Assessment_<report_id>.xlsx`
+
+#### 2. Export CSV Assessment Report
+- **Endpoint**: `POST /api/reports/csv`
+- **Content-Type**: `application/json`
+- **Response MIME Type**: `text/csv; charset=utf-8`
+- **Default Filename**: `LoanGuard_AI_Assessment_<report_id>.csv`
+
+#### Example API Request (cURL)
+```bash
+curl -X POST "http://127.0.0.1:5000/api/reports/excel" \
+     -H "Content-Type: application/json" \
+     -d '{
+       "loan_amount": 10000,
+       "installment": 308.50,
+       "int_rate": 6.89,
+       "annual_income": 95000,
+       "dti": 11.2,
+       "application_type": "INDIVIDUAL",
+       "verification_status": "Verified",
+       "home_ownership": "MORTGAGE"
+     }' \
+     --output "LoanGuard_AI_Assessment_Report.xlsx"
+```
+
+### 11.4 Security & Data Handling Safeguards
+
+- **Authoritative Server Inference**: Client-supplied predictions or confidence percentages are never blindly trusted. The backend validates numeric constraints and executes model scoring authoritatively.
+- **Formula Injection Mitigation**: To protect underwriters against spreadsheet formula injection attacks, any user-controlled string beginning with formula execution characters (`=`, `+`, `-`, `@`) is safely escaped prior to writing.
+- **Zero Disk Persistence**: Reports are created dynamically in transient RAM using Python's `io.BytesIO` streams and transmitted via Flask `send_file`, ensuring no applicant data accumulates on the server filesystem.
+- **Strict Input Constraints**: Rejects negative amounts, missing financial fields, and malformed JSON payloads with descriptive HTTP 400 status codes.
+
+---
+
+## 12. Project Folder Structure
 
 ```text
 loan-default-risk-prediction/
@@ -241,17 +309,19 @@ loan-default-risk-prediction/
 │   ├── css/
 │   │   └── style.css               # Design tokens, glassmorphism, responsive grid
 │   └── js/
-│       └── main.js                 # Event listeners, reactive math, AJAX fetch
+│       └── main.js                 # Event listeners, reactive math, AJAX fetch, reports
 ├── templates/
-│   └── index.html                  # Semantic HTML5 view template
+│   └── index.html                  # Semantic HTML5 view template with report export hub
 ├── Data/
 │   ├── Loan_Data.csv               # Historical training dataset (5.88 MB)
 │   └── Loan_Data.xlsx              # Relational multi-table dataset (10.51 MB)
 ├── .gitignore                      # Git exclusion rules
 ├── .python-version                 # Environment Python version pin (3.11)
 ├── app.py                          # Flask WSGI web application & REST endpoints
+├── report_generator.py             # Openpyxl & CSV in-memory report generation engine
+├── test_reports.py                 # Automated unit tests covering 19 report scenarios
 ├── Procfile                        # Render / Cloud WSGI startup declaration
-├── requirements.txt                # Production Python dependencies
+├── requirements.txt                # Production Python dependencies (includes openpyxl)
 ├── RENDER_DEPLOYMENT_GUIDE.md      # Step-by-step cloud deployment manual
 ├── LICENSE                         # MIT License
 └── README.md                       # Project documentation
@@ -327,6 +397,12 @@ $env:FLASK_DEBUG="1"; python app.py
 
 # macOS / Linux
 FLASK_DEBUG=1 python3 app.py
+```
+
+### Running the Automated Test Suite
+To verify model inference, report generation, and all 19 underwriting test cases:
+```bash
+python test_reports.py
 ```
 
 ---

@@ -1915,3 +1915,252 @@ select {
 .text-red { color: var(--crimson-risk) !important; }
 .text-amber { color: var(--amber-warning) !important; }
 .text-blue { color: var(--cyan-primary) !important; }
+
+/* ============================================================
+   Download Assessment Report Section
+   ============================================================ */
+.report-download-section {
+    background: rgba(12, 18, 34, 0.7);
+    border: 1px solid rgba(56, 189, 248, 0.22);
+    border-radius: var(--radius-md);
+    padding: 1.25rem 1.35rem;
+    box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.5);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    transition: var(--transition);
+}
+
+.report-section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 0.85rem;
+    border-bottom: 1px solid var(--border-subtle);
+    flex-wrap: wrap;
+}
+
+.report-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.report-icon {
+    width: 34px;
+    height: 34px;
+    background: rgba(56, 189, 248, 0.12);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+    border-radius: var(--radius-xs);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--cyan-primary);
+    flex-shrink: 0;
+}
+
+.report-heading {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    color: #ffffff;
+    line-height: 1.2;
+}
+
+.report-sub {
+    font-size: 0.76rem;
+    color: var(--text-muted);
+    line-height: 1.3;
+}
+
+.report-status-badge {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--cyan-primary);
+    background: rgba(56, 189, 248, 0.08);
+    border: 1px solid rgba(56, 189, 248, 0.25);
+    padding: 0.25rem 0.65rem;
+    border-radius: var(--radius-full);
+}
+
+.report-actions-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.85rem;
+}
+
+@media (max-width: 680px) {
+    .report-actions-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.btn-report {
+    background: var(--bg-surface-elevated);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-sm);
+    padding: 0.85rem 1rem;
+    cursor: pointer;
+    font-family: inherit;
+    text-align: left;
+    transition: var(--transition);
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+}
+
+.btn-report::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 0.25s ease;
+    pointer-events: none;
+}
+
+.btn-report-excel:hover {
+    border-color: rgba(16, 185, 129, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -4px rgba(16, 185, 129, 0.25);
+}
+
+.btn-report-excel::before {
+    background: radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.15), transparent 70%);
+}
+
+.btn-report-excel:hover::before {
+    opacity: 1;
+}
+
+.btn-report-csv:hover {
+    border-color: rgba(56, 189, 248, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px -4px rgba(56, 189, 248, 0.25);
+}
+
+.btn-report-csv::before {
+    background: radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.15), transparent 70%);
+}
+
+.btn-report-csv:hover::before {
+    opacity: 1;
+}
+
+.btn-report:active {
+    transform: scale(0.985);
+}
+
+.btn-report:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    pointer-events: none;
+    transform: none;
+    box-shadow: none;
+}
+
+.btn-report-inner {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    position: relative;
+    z-index: 1;
+}
+
+.btn-report-icon-box {
+    width: 38px;
+    height: 38px;
+    border-radius: var(--radius-xs);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    transition: var(--transition);
+}
+
+.excel-icon-box {
+    background: rgba(16, 185, 129, 0.14);
+    color: var(--emerald-safe);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+}
+
+.btn-report-excel:hover .excel-icon-box {
+    background: var(--emerald-safe);
+    color: #ffffff;
+    box-shadow: 0 0 14px rgba(16, 185, 129, 0.5);
+}
+
+.csv-icon-box {
+    background: rgba(56, 189, 248, 0.14);
+    color: var(--cyan-primary);
+    border: 1px solid rgba(56, 189, 248, 0.3);
+}
+
+.btn-report-csv:hover .csv-icon-box {
+    background: var(--cyan-primary);
+    color: #060912;
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.5);
+}
+
+.btn-report-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+    flex-grow: 1;
+}
+
+.btn-report-main {
+    font-family: var(--font-heading);
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #ffffff;
+    line-height: 1.25;
+}
+
+.btn-report-hint {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+}
+
+.btn-report-spinner {
+    display: none;
+    width: 18px;
+    height: 18px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-top-color: var(--cyan-primary);
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    flex-shrink: 0;
+}
+
+.btn-report.loading .btn-report-spinner {
+    display: block;
+}
+
+.btn-report.loading .btn-report-icon-box {
+    opacity: 0.4;
+}
+
+.report-feedback-msg {
+    margin-top: 0.75rem;
+    padding: 0.65rem 0.9rem;
+    border-radius: var(--radius-xs);
+    font-size: 0.78rem;
+    line-height: 1.4;
+    transition: var(--transition);
+}
+
+.report-feedback-msg.error {
+    background: var(--crimson-bg);
+    border: 1px solid var(--crimson-border);
+    color: var(--crimson-risk);
+}
+
+.report-feedback-msg.success {
+    background: var(--emerald-bg);
+    border: 1px solid var(--emerald-border);
+    color: var(--emerald-safe);
+}
+

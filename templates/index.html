@@ -512,6 +512,52 @@
                             </div>
                             <p class="guidance-text" id="recommendationText">Applicant displays a strong debt-to-income profile with minimal risk of charge-off. Recommended for automatic verification and loan origination.</p>
                         </div>
+
+                        <!-- Report Generation & Export Section -->
+                        <div class="report-download-section" id="reportDownloadSection">
+                            <div class="report-section-header">
+                                <div class="report-title-wrap">
+                                    <div class="report-icon">
+                                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                    </div>
+                                    <div>
+                                        <h3 class="report-heading">DOWNLOAD ASSESSMENT REPORT</h3>
+                                        <p class="report-sub">Export verified underwriter audit dossier with actual ML model outputs</p>
+                                    </div>
+                                </div>
+                                <span class="report-status-badge" id="reportIdBadge">Audit Package Ready</span>
+                            </div>
+
+                            <div class="report-actions-grid">
+                                <button type="button" class="btn-report btn-report-excel" id="btnDownloadExcel" title="Download Excel assessment report (.xlsx)">
+                                    <span class="btn-report-inner">
+                                        <span class="btn-report-icon-box excel-icon-box">
+                                            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+                                        </span>
+                                        <span class="btn-report-meta">
+                                            <span class="btn-report-main">Download Excel Report (.xlsx)</span>
+                                            <span class="btn-report-hint">3 Worksheets • Audit & Policy Ratios</span>
+                                        </span>
+                                        <span class="btn-report-spinner" id="excelReportSpinner"></span>
+                                    </span>
+                                </button>
+
+                                <button type="button" class="btn-report btn-report-csv" id="btnDownloadCsv" title="Download CSV assessment report (.csv)">
+                                    <span class="btn-report-inner">
+                                        <span class="btn-report-icon-box csv-icon-box">
+                                            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+                                        </span>
+                                        <span class="btn-report-meta">
+                                            <span class="btn-report-main">Download CSV Report (.csv)</span>
+                                            <span class="btn-report-hint">Two-Column Structure • Raw Data Export</span>
+                                        </span>
+                                        <span class="btn-report-spinner" id="csvReportSpinner"></span>
+                                    </span>
+                                </button>
+                            </div>
+
+                            <div class="report-feedback-msg" id="reportFeedbackMsg" style="display: none;"></div>
+                        </div>
                     </div>
                 </div>
             </div>
